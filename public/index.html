@@ -5,26 +5,227 @@
     <style type="text/css">
       html { height: 100% }
       body { height: 100%; margin: 0; padding: 0 }
-      #map-canvas { height: 100% }
+      #map-canvas { 
+        height: 250px; 
+        width: 350px; 
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        border: 1px solid black;
+        opacity: 0.65;
+      }
+      #streetview {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      #go-on {
+        display: block;
+        padding: 5px;
+        border: 1px solid black;
+        background-color: green;
+        color: white;
+        position: absolute;
+        top: 10px;
+        left: 10px;
+      }
     </style>
     <script type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4TVBOaPFwZL6lhyQqX0rpBkTVXNRHxaM&sensor=false">
     </script>
     <script type="text/javascript">
+
+      var map,
+          panorama,
+          markerArray = [],
+          path = [],
+          currentBearing,
+          currentPosition,
+          nextPositionIndex = 1,
+          startPosition,
+          endPosition;
+
       function initialize() {
+
+        // Coffee Shop
+        startPosition = new google.maps.LatLng( -37.784008, 144.983368 );
+        endPosition   = new google.maps.LatLng( -37.787132, 144.982544 );
+
+        // Lettuce Systems
+        // startPosition = new google.maps.LatLng( -37.785885, 144.930771 );
+        // endPosition   = new google.maps.LatLng( -37.796574, 144.932587 );
+
+
+        currentPosition = startPosition;
+
         var mapOptions = {
-          center: new google.maps.LatLng(37.797221, -122.406557),
-          zoom: 16,
+          center: currentPosition,
+          zoom: 18,
           mapTypeId: google.maps.MapTypeId.ROADMAP
         };
-        var map = new google.maps.Map(document.getElementById("map-canvas"),
-            mapOptions);
+        map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+
+        var panoramaOptions = {
+          position: currentPosition,
+          pov: {
+            heading: 0,
+            pitch: 0
+          },
+          panControl: false,
+          addressControl: false,
+          zoomControl: false
+        };
+        panorama = new  google.maps.StreetViewPanorama(document.getElementById("streetview"), panoramaOptions);
+        google.maps.event.addListener(panorama, 'position_changed', function() {
+            if ( path.length > 0 )
+              updatePosition();
+        });
+        map.setStreetView(panorama);
+
+        var directionsDisplay = new google.maps.DirectionsRenderer();
+        directionsDisplay.setMap(map);
+
+        var directionsService = new google.maps.DirectionsService();
+        var request = {
+            origin: currentPosition,
+            destination: endPosition,
+            travelMode: google.maps.DirectionsTravelMode.WALKING
+        };
+        directionsService.route(request, function(response, status) {
+          if (status == google.maps.DirectionsStatus.OK) {
+            // directionsDisplay.setDirections( response );
+            showSteps( response );
+            processDirections( response );
+          }
+        });
+
+        // document.getElementById('go-on').addEventListener('click', function(e) {
+        //   e.preventDefault();
+        //   followPath();
+        // });
+
       }
       google.maps.event.addDomListener(window, 'load', initialize);
+
+      function processDirections( directionResult ) {
+        path = directionResult.routes[0].overview_path;
+        currentBearing = getBearing( currentPosition, path[ nextPositionIndex ] );
+        faceForward();
+        followPath();
+      }
+
+      function updatePosition() {
+        currentPosition = panorama.getPosition();
+
+        for ( var skipIndex=nextPositionIndex; skipIndex < path.length - 1; skipIndex++ ) {
+          var distance = google.maps.geometry.spherical.computeDistanceBetween( currentPosition, 
+            path[ skipIndex ] );
+          if ( distance < 10 ) {
+            console.log('Point reached');
+            console.log( skipIndex );
+            console.log( path.length );
+            if ( skipIndex < path.length - 1 ) {
+              nextPositionIndex = skipIndex + 1;
+            } else {
+              alert('End of walk');
+            }
+            currentBearing = getBearing( currentPosition, path[ nextPositionIndex ] );
+            faceForward();
+          }
+
+        }
+
+        // Check for end
+        var distanceFromEnd = google.maps.geometry.spherical.computeDistanceBetween( currentPosition, endPosition );
+        if ( distanceFromEnd < 10 ) {
+          alert('End of Walking');
+        }
+
+        map.setCenter( currentPosition );
+
+        setTimeout(function() {
+          followPath();
+          console.log('Follow');
+        }, 1500);
+      }
+
+      function followPath() {
+        var links = panorama.getLinks(),
+          closestLink;
+        closestLink = links[0];
+        console.log( 'Trying to move' );
+        for (var i=1; i<links.length; i++) {
+          if ( Math.abs( links[i].heading - currentBearing ) < Math.abs( closestLink.heading - currentBearing ) ) {
+            closestLink = links[i];
+            // Todo, handle no 'next closest link'
+            console.log( links[i] );
+          }
+        }
+        panorama.setPano( closestLink.pano );
+      }
+
+      function faceForward() {
+        panorama.setPov({ heading: currentBearing, pitch: 0 });
+      }
+
+      function getBearing(origin, destination) {
+        if (origin.equals(destination)) {
+          return null;
+        }
+        var lat1 = origin.lat().toRad();
+        var lat2 = destination.lat().toRad();
+        var dLon = (destination.lng()-origin.lng()).toRad();
+
+        var y = Math.sin(dLon) * Math.cos(lat2);
+        var x = Math.cos(lat1)*Math.sin(lat2) -
+                Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLon);
+        return Math.atan2(y, x).toBrng();
+      }
+
+
+function showSteps(directionResult) {
+  // For each step, place a marker, and add the text to the marker's
+  // info window. Also attach the marker to an array so we
+  // can keep track of it and remove it when calculating new
+  // routes.
+  var path = directionResult.routes[0].overview_path;
+  for (var i = 0; i < path.length; i++) {
+    var marker = new google.maps.Marker({
+      position: path[i],
+      map: map
+    });
+    markerArray[i] = marker;
+  }
+}
+
+   /**
+    * Convert an angle in degrees to radians
+    */
+    Number.prototype.toRad = function() {
+      return this * Math.PI / 180;
+    }
+
+   /**
+    * Convert an angle in radians to degrees (signed)
+    */
+    Number.prototype.toDeg = function() {
+      return this * 180 / Math.PI;
+    }
+
+   /**
+    * Convert radians to degrees (as bearing: 0...360)
+    */
+    Number.prototype.toBrng = function() {
+      return (this.toDeg()+360) % 360;
+    }
+
     </script>
   </head>
   <body>
-    <div id="streetview">SV</div>
-    <div id="map-canvas">MAP</div>
+    <div id="streetview"></div>
+    <div id="map-canvas"></div>
+    <!-- <a id="go-on" href="#">Advance</div> -->
   </body>
 </html>

@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  walk_id: 1
+  description: MyString
+  lat: MyString
+  lon: MyString
+
+two:
+  walk_id: 1
+  description: MyString
+  lat: MyString
+  lon: MyString

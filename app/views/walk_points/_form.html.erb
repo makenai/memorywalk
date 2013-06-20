@@ -1,0 +1,33 @@
+<%= form_for(@walk_point) do |f| %>
+  <% if @walk_point.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@walk_point.errors.count, "error") %> prohibited this walk_point from being saved:</h2>
+
+      <ul>
+      <% @walk_point.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :walk_id %><br />
+    <%= f.number_field :walk_id %>
+  </div>
+  <div class="field">
+    <%= f.label :description %><br />
+    <%= f.text_field :description %>
+  </div>
+  <div class="field">
+    <%= f.label :lat %><br />
+    <%= f.text_field :lat %>
+  </div>
+  <div class="field">
+    <%= f.label :lon %><br />
+    <%= f.text_field :lon %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

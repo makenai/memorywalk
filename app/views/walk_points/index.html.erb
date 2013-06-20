@@ -1,0 +1,29 @@
+<h1>Listing walk_points</h1>
+
+<table>
+  <tr>
+    <th>Walk</th>
+    <th>Description</th>
+    <th>Lat</th>
+    <th>Lon</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @walk_points.each do |walk_point| %>
+  <tr>
+    <td><%= walk_point.walk_id %></td>
+    <td><%= walk_point.description %></td>
+    <td><%= walk_point.lat %></td>
+    <td><%= walk_point.lon %></td>
+    <td><%= link_to 'Show', walk_point %></td>
+    <td><%= link_to 'Edit', edit_walk_point_path(walk_point) %></td>
+    <td><%= link_to 'Destroy', walk_point, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Walk point', new_walk_point_path %>

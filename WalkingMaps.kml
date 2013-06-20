@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.2">
+<Document>
+  <name>Walking Maps </name>
+  <description><![CDATA[As requested!]]></description>
+  <Style id="style9">
+    <IconStyle>
+      <Icon>
+        <href></href>
+      </Icon>
+    </IconStyle>
+  </Style>
+  <Style id="style15">
+    <IconStyle>
+      <Icon>
+        <href></href>
+      </Icon>
+    </IconStyle>
+  </Style>
+  <Style id="style3">
+    <LineStyle>
+      <color>73FF0000</color>
+      <width>5</width>
+    </LineStyle>
+  </Style>
+  <Style id="style8">
+    <IconStyle>
+      <Icon>
+        <href></href>
+      </Icon>
+    </IconStyle>
+  </Style>
+  <Style id="style4">
+    <IconStyle>
+      <Icon>
+        <href></href>
+      </Icon>
+    </IconStyle>
+  </Style>
+  <Style id="style1">
+    <LineStyle>
+      <color>73FF0000</color>
+      <width>5</width>
+    </LineStyle>
+  </Style>
+  <Style id="style7">
+    <IconStyle>
+      <Icon>
+        <href></href>
+      </Icon>
+    </IconStyle>
+  </Style>
+  <Style id="style11">
+    <LineStyle>
+      <color>73FF0000</color>
+      <width>5</width>
+    </LineStyle>
+  </Style>
+  <Style id="style12">
+    <IconStyle>
+      <Icon>
+        <href></href>
+      </Icon>
+    </IconStyle>
+  </Style>
+  <Style id="style14">
+    <IconStyle>
+      <Icon>
+        <href></href>
+      </Icon>
+    </IconStyle>
+  </Style>
+  <Style id="style2">
+    <LineStyle>
+      <color>73FF0000</color>
+      <width>5</width>
+    </LineStyle>
+  </Style>
+  <Style id="style13">
+    <IconStyle>
+      <Icon>
+        <href></href>
+      </Icon>
+    </IconStyle>
+  </Style>
+  <Style id="style10">
+    <IconStyle>
+      <Icon>
+        <href></href>
+      </Icon>
+    </IconStyle>
+  </Style>
+  <Style id="style6">
+    <LineStyle>
+      <color>73FF0000</color>
+      <width>5</width>
+    </LineStyle>
+  </Style>
+  <Style id="style5">
+    <IconStyle>
+      <Icon>
+        <href></href>
+      </Icon>
+    </IconStyle>
+  </Style>
+  <Placemark>
+    <name>Caffe Piccante</name>
+    <styleUrl>#style9</styleUrl>
+    <Point>
+      <coordinates>144.983368,-37.784008,0.000000</coordinates>
+    </Point>
+  </Placemark>
+  <Placemark>
+    <name>From: Caffe Piccante, 216 St Georges Road, Fitzroy North VIC 3068</name>
+    <styleUrl>#style15</styleUrl>
+    <Point>
+      <coordinates>144.983276,-37.783955,0.000000</coordinates>
+    </Point>
+  </Placemark>
+  <Placemark>
+    <name>Walking directions to Unknown road</name>
+    <styleUrl>#style3</styleUrl>
+    <ExtendedData>
+      <Data name="_SnapToRoads">
+        <value>true</value>
+      </Data>
+    </ExtendedData>
+    <LineString>
+      <tessellate>1</tessellate>
+      <coordinates>
+        144.983276,-37.783958,0.000000
+        144.981003,-37.786598,0.000000
+        144.980713,-37.787071,0.000000
+        144.980713,-37.787071,0.000000
+        144.981567,-37.787369,0.000000
+        144.981873,-37.787319,0.000000
+        144.982285,-37.787159,0.000000
+        144.982544,-37.787128,0.000000
+      </coordinates>
+    </LineString>
+  </Placemark>
+  <Placemark>
+    <name>To: Unknown road</name>
+    <styleUrl>#style8</styleUrl>
+    <Point>
+      <coordinates>144.982544,-37.787132,0.000000</coordinates>
+    </Point>
+  </Placemark>
+  <Placemark>
+    <name>From: Polly, 401 Brunswick Street, Fitzroy VIC 3065</name>
+    <styleUrl>#style4</styleUrl>
+    <Point>
+      <coordinates>144.979034,-37.795120,0.000000</coordinates>
+    </Point>
+  </Placemark>
+  <Placemark>
+    <name>Walking directions to St David St</name>
+    <styleUrl>#style1</styleUrl>
+    <ExtendedData>
+      <Data name="_SnapToRoads">
+        <value>true</value>
+      </Data>
+    </ExtendedData>
+    <LineString>
+      <tessellate>1</tessellate>
+      <coordinates>
+        144.979034,-37.795120,0.000000
+        144.978104,-37.800610,0.000000
+        144.978104,-37.800610,0.000000
+        144.983902,-37.801220,0.000000
+      </coordinates>
+    </LineString>
+  </Placemark>
+  <Placemark>
+    <name>To: St David St</name>
+    <styleUrl>#style7</styleUrl>
+    <Point>
+      <coordinates>144.983902,-37.801224,0.000000</coordinates>
+    </Point>
+  </Placemark>
+  <Placemark>
+    <name>Walking directions to 286 Smith Street, Collingwood, Victoria</name>
+    <styleUrl>#style11</styleUrl>
+    <ExtendedData>
+      <Data name="_SnapToRoads">
+        <value>true</value>
+      </Data>
+    </ExtendedData>
+    <LineString>
+      <tessellate>1</tessellate>
+      <coordinates>
+        144.983902,-37.801220,0.000000
+        144.983994,-37.800579,0.000000
+      </coordinates>
+    </LineString>
+  </Placemark>
+  <Placemark>
+    <name>To: 286 Smith Street, Collingwood, Victoria</name>
+    <styleUrl>#style12</styleUrl>
+    <Point>
+      <coordinates>144.983994,-37.800583,0.000000</coordinates>
+    </Point>
+  </Placemark>
+  <Placemark>
+    <name>From: 30 Finsbury Street, Flemington, Victoria</name>
+    <styleUrl>#style14</styleUrl>
+    <Point>
+      <coordinates>144.930771,-37.785885,0.000000</coordinates>
+    </Point>
+  </Placemark>
+  <Placemark>
+    <name>Walking directions to Lettuce Systems, 10 Elizabeth Street, Kensington VIC 3031</name>
+    <styleUrl>#style2</styleUrl>
+    <ExtendedData>
+      <Data name="_SnapToRoads">
+        <value>true</value>
+      </Data>
+    </ExtendedData>
+    <LineString>
+      <tessellate>1</tessellate>
+      <coordinates>
+        144.930786,-37.785881,0.000000
+        144.929688,-37.785770,0.000000
+        144.929688,-37.785770,0.000000
+        144.929565,-37.786850,0.000000
+        144.929565,-37.786850,0.000000
+        144.929214,-37.786888,0.000000
+        144.929214,-37.786888,0.000000
+        144.929474,-37.788139,0.000000
+        144.929474,-37.788139,0.000000
+        144.930847,-37.793861,0.000000
+        144.930893,-37.794289,0.000000
+        144.930847,-37.794521,0.000000
+        144.930847,-37.794521,0.000000
+        144.931107,-37.794552,0.000000
+        144.931107,-37.794552,0.000000
+        144.931702,-37.796349,0.000000
+        144.931702,-37.796349,0.000000
+        144.932556,-37.796471,0.000000
+        144.932556,-37.796471,0.000000
+        144.932587,-37.796570,0.000000
+      </coordinates>
+    </LineString>
+  </Placemark>
+  <Placemark>
+    <name>To: Lettuce Systems, 10 Elizabeth Street, Kensington VIC 3031</name>
+    <styleUrl>#style13</styleUrl>
+    <Point>
+      <coordinates>144.932587,-37.796574,0.000000</coordinates>
+    </Point>
+  </Placemark>
+  <Placemark>
+    <name>From: Flinders St/State Route 30</name>
+    <styleUrl>#style10</styleUrl>
+    <Point>
+      <coordinates>144.967575,-37.817497,0.000000</coordinates>
+    </Point>
+  </Placemark>
+  <Placemark>
+    <name>Walking directions to Riverland Bar, Melbourne, Victoria</name>
+    <styleUrl>#style6</styleUrl>
+    <ExtendedData>
+      <Data name="_SnapToRoads">
+        <value>true</value>
+      </Data>
+    </ExtendedData>
+    <LineString>
+      <tessellate>1</tessellate>
+      <coordinates>
+        144.967575,-37.817501,0.000000
+        144.967545,-37.817509,0.000000
+        144.967545,-37.817509,0.000000
+        144.968063,-37.818588,0.000000
+        144.968063,-37.818588,0.000000
+        144.968246,-37.818668,0.000000
+        144.968704,-37.818649,0.000000
+      </coordinates>
+    </LineString>
+  </Placemark>
+  <Placemark>
+    <name>To: Riverland Bar, Melbourne, Victoria</name>
+    <styleUrl>#style5</styleUrl>
+    <Point>
+      <coordinates>144.968704,-37.818649,0.000000</coordinates>
+    </Point>
+  </Placemark>
+</Document>
+</kml>

@@ -2,9 +2,9 @@ class CreateWalkPoints < ActiveRecord::Migration
   def change
     create_table :walk_points do |t|
       t.integer :walk_id
-      t.string :description
+      t.string :location
       t.string :lat
-      t.string :lon
+      t.string :long
 
       t.timestamps
     end

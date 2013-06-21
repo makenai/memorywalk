@@ -26,6 +26,9 @@ class WalksController < ApplicationController
   def new
     @walk = Walk.new
 
+    @walk.walk_points << WalkPoint.new( label: 'From' )
+    @walk.walk_points << WalkPoint.new( label: 'To' )
+
     respond_to do |format|
       format.html # new.html.erb
       format.json { render json: @walk }

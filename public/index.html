@@ -6,13 +6,13 @@
       html { height: 100% }
       body { height: 100%; margin: 0; padding: 0 }
       #map-canvas { 
-        height: 250px; 
+        height: 300px; 
         width: 350px; 
         position: absolute;
         right: 10px;
         top: 10px;
         border: 1px solid black;
-        opacity: 0.65;
+        opacity: 0.85;
       }
       #streetview {
         height: 100%;
@@ -45,17 +45,25 @@
           currentPosition,
           nextPositionIndex = 1,
           startPosition,
-          endPosition;
+          endPosition,
+          moveTimeout = 3500,
+          nextPositionMarker,
+          misturnCount = 0;
 
       function initialize() {
 
         // Coffee Shop
-        startPosition = new google.maps.LatLng( -37.784008, 144.983368 );
-        endPosition   = new google.maps.LatLng( -37.787132, 144.982544 );
+        // startPosition = new google.maps.LatLng( -37.784008, 144.983368 );
+        // endPosition   = new google.maps.LatLng( -37.787132, 144.982544 );
 
         // Lettuce Systems
-        // startPosition = new google.maps.LatLng( -37.785885, 144.930771 );
-        // endPosition   = new google.maps.LatLng( -37.796574, 144.932587 );
+        startPosition = new google.maps.LatLng( -37.785885, 144.930771 );
+        endPosition   = new google.maps.LatLng( -37.796574, 144.932587 );
+
+        // Flinders to Bar
+        // startPosition = new google.maps.LatLng( -37.817497, 144.967575 );
+        // endPosition   = new google.maps.LatLng( -37.818649, 144.968704 );
+
 
 
         currentPosition = startPosition;
@@ -63,7 +71,11 @@
         var mapOptions = {
           center: currentPosition,
           zoom: 18,
-          mapTypeId: google.maps.MapTypeId.ROADMAP
+          panControl: false,
+          mapTypeControl: false,
+          scaleControl: false,    
+          zoomControl: false,      
+          mapTypeId: google.maps.MapTypeId.HYBRID
         };
         map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
 
@@ -75,7 +87,8 @@
           },
           panControl: false,
           addressControl: false,
-          zoomControl: false
+          zoomControl: false,
+          // linksControl: false
         };
         panorama = new  google.maps.StreetViewPanorama(document.getElementById("streetview"), panoramaOptions);
         google.maps.event.addListener(panorama, 'position_changed', function() {
@@ -96,78 +109,109 @@
         directionsService.route(request, function(response, status) {
           if (status == google.maps.DirectionsStatus.OK) {
             // directionsDisplay.setDirections( response );
-            showSteps( response );
+            // showSteps( response );
             processDirections( response );
           }
         });
 
-        // document.getElementById('go-on').addEventListener('click', function(e) {
-        //   e.preventDefault();
-        //   followPath();
-        // });
+        document.getElementById('go-on').addEventListener('click', function(e) {
+          e.preventDefault();
+          console.log('<Move>');
+          followPath();
+          console.log('</Move>');
+        });
 
       }
       google.maps.event.addDomListener(window, 'load', initialize);
 
       function processDirections( directionResult ) {
         path = directionResult.routes[0].overview_path;
-        currentBearing = getBearing( currentPosition, path[ nextPositionIndex ] );
-        faceForward();
+        nextPositionMarker = new google.maps.Marker({ position: path[0], map: map });
         followPath();
       }
 
       function updatePosition() {
         currentPosition = panorama.getPosition();
+        map.setCenter( currentPosition );
+        currentBearing = getBearing( currentPosition, path[ nextPositionIndex ] );
+        
+        // Remove old Marker
+        nextPositionMarker.setMap(null);
 
         for ( var skipIndex=nextPositionIndex; skipIndex < path.length - 1; skipIndex++ ) {
           var distance = google.maps.geometry.spherical.computeDistanceBetween( currentPosition, 
             path[ skipIndex ] );
           if ( distance < 10 ) {
             console.log('Point reached');
-            console.log( skipIndex );
-            console.log( path.length );
-            if ( skipIndex < path.length - 1 ) {
+            console.log( skipIndex + ' / ' + path.length );
+            if ( skipIndex < path.length ) {
               nextPositionIndex = skipIndex + 1;
             } else {
               alert('End of walk');
             }
-            currentBearing = getBearing( currentPosition, path[ nextPositionIndex ] );
-            faceForward();
           }
-
         }
+
+        faceForward();
+
+        nextPositionMarker = new google.maps.Marker({ 
+          position: path[ nextPositionIndex ], 
+          map: map, 
+          title: 'Idx ' + nextPositionIndex + ': ' + path[ nextPositionIndex ].toString() 
+        });
 
         // Check for end
         var distanceFromEnd = google.maps.geometry.spherical.computeDistanceBetween( currentPosition, endPosition );
-        if ( distanceFromEnd < 10 ) {
+        if ( distanceFromEnd < 15 ) {
           alert('End of Walking');
+        } else {
+          // setTimeout(function() {
+          //   followPath();
+          // }, moveTimeout );
         }
 
-        map.setCenter( currentPosition );
-
-        setTimeout(function() {
-          followPath();
-          console.log('Follow');
-        }, 1500);
       }
 
       function followPath() {
         var links = panorama.getLinks(),
-          closestLink;
-        closestLink = links[0];
-        console.log( 'Trying to move' );
-        for (var i=1; i<links.length; i++) {
+          closestLink = links[0];
+
+        for (var i=0; i<links.length; i++) {
+          console.log( 'Link ' + i + ': ' + links[i].heading );
           if ( Math.abs( links[i].heading - currentBearing ) < Math.abs( closestLink.heading - currentBearing ) ) {
             closestLink = links[i];
-            // Todo, handle no 'next closest link'
-            console.log( links[i] );
           }
+        }
+        // Todo, handle no 'next closest link' by checking heading difference
+        var difference = Math.abs( closestLink.heading - currentBearing );
+        console.log( 'Link Heading: ' + closestLink.heading );
+        console.log( 'Current Heading: ' + currentBearing );
+        console.log( 'Difference: ' + difference );
+        console.log( '--' );
+        if ( difference > 25 ) {
+          if ( ++misturnCount > 3 ) {
+            // We can't turn the way we want. Let's teleport.
+            alert("Cannot turn. Teleporting. Difference is " + difference );
+            panorama.setPosition( path[ nextPositionIndex ] );
+            return;
+          }
+        } else {
+          misturnCount = 0;
         }
         panorama.setPano( closestLink.pano );
       }
 
       function faceForward() {
-        panorama.setPov({ heading: currentBearing, pitch: 0 });
+          console.log( '<Turning>' );
+          console.log( 'Current: ' + currentPosition );
+          console.log( 'Index: ' + nextPositionIndex );
+          console.log( 'Next: ' + path[ nextPositionIndex ]);
+          
+          currentBearing = getBearing( currentPosition, path[ nextPositionIndex ] );
+          if ( currentBearing != null )
+            panorama.setPov({ heading: currentBearing, pitch: 0 });  
+          console.log( 'Bearing: ' + currentBearing );
+          console.log( '</Turning>' );
       }
 
       function getBearing(origin, destination) {
@@ -191,6 +235,7 @@ function showSteps(directionResult) {
   // can keep track of it and remove it when calculating new
   // routes.
   var path = directionResult.routes[0].overview_path;
+  return;
   for (var i = 0; i < path.length; i++) {
     var marker = new google.maps.Marker({
       position: path[i],
@@ -226,6 +271,6 @@ function showSteps(directionResult) {
   <body>
     <div id="streetview"></div>
     <div id="map-canvas"></div>
-    <!-- <a id="go-on" href="#">Advance</div> -->
+    <a id="go-on" href="#">Advance</div>
   </body>
 </html>

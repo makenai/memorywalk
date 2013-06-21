@@ -6,8 +6,8 @@
       html { height: 100% }
       body { height: 100%; margin: 0; padding: 0 }
       #map-canvas { 
-        height: 300px; 
-        width: 350px; 
+        height: 200px; 
+        width: 250px; 
         position: absolute;
         right: 10px;
         top: 10px;
@@ -48,9 +48,12 @@
           endPosition,
           moveTimeout = 3500,
           nextPositionMarker,
-          misturnCount = 0;
+          misturnCount = 0,
+          moveCount = 0;
 
       function initialize() {
+
+        google.maps.visualRefresh = true;
 
         // Coffee Shop
         // startPosition = new google.maps.LatLng( -37.784008, 144.983368 );
@@ -63,8 +66,6 @@
         // Flinders to Bar
         // startPosition = new google.maps.LatLng( -37.817497, 144.967575 );
         // endPosition   = new google.maps.LatLng( -37.818649, 144.968704 );
-
-
 
         currentPosition = startPosition;
 
@@ -124,6 +125,10 @@
       }
       google.maps.event.addDomListener(window, 'load', initialize);
 
+      function endOfWalk() {
+        alert('End of Walking');
+      }
+
       function processDirections( directionResult ) {
         path = directionResult.routes[0].overview_path;
         nextPositionMarker = new google.maps.Marker({ position: path[0], map: map });
@@ -132,7 +137,9 @@
 
       function updatePosition() {
         currentPosition = panorama.getPosition();
-        map.setCenter( currentPosition );
+        // Pan every 3 moves
+        if ( moveCount++ % 3 == 0 )
+          map.panTo( currentPosition );
         currentBearing = getBearing( currentPosition, path[ nextPositionIndex ] );
         
         // Remove old Marker
@@ -147,7 +154,7 @@
             if ( skipIndex < path.length ) {
               nextPositionIndex = skipIndex + 1;
             } else {
-              alert('End of walk');
+              endOfWalk();
             }
           }
         }
@@ -163,7 +170,7 @@
         // Check for end
         var distanceFromEnd = google.maps.geometry.spherical.computeDistanceBetween( currentPosition, endPosition );
         if ( distanceFromEnd < 15 ) {
-          alert('End of Walking');
+          endOfWalk();
         } else {
           // setTimeout(function() {
           //   followPath();
@@ -190,9 +197,10 @@
         console.log( '--' );
         if ( difference > 25 ) {
           if ( ++misturnCount > 3 ) {
-            // We can't turn the way we want. Let's teleport.
-            alert("Cannot turn. Teleporting. Difference is " + difference );
-            panorama.setPosition( path[ nextPositionIndex ] );
+            // Sorry, can't walk any more.
+            endOfWalk();
+            // alert("Cannot turn. Teleporting. Difference is " + difference );
+            // panorama.setPosition( path[ nextPositionIndex ] );
             return;
           }
         } else {

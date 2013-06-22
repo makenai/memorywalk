@@ -6,14 +6,15 @@
         currentBearing,
         currentPosition,
         nextPositionIndex = 1,
-        moveTimeout = 800,
+        moveTimeout = 1000,
         nextPositionMarker,
         misturnCount = 0,
         moveCount = 0,
         musicPlaylist = [],
         currentMusic = 0,
         walkList = [],
-        currentWalk = 0;
+        currentWalk = 0,
+        initializingPosition = false;
 
 <% ([ @walk ] + @other_walks).each do |walk| %>
     walkList.push({
@@ -27,6 +28,7 @@
 <% end %>
 
     function initialize() {
+
 
       google.maps.visualRefresh = true;
 
@@ -55,9 +57,14 @@
         // linksControl: false
       };
       panorama = new  google.maps.StreetViewPanorama(document.getElementById("streetview"), panoramaOptions);
-      google.maps.event.addListener(panorama, 'position_changed', function() {
-          if ( path.length > 0 )
+      google.maps.event.addListener(panorama, 'position_changed', function(e) {
+          if ( path.length > 0 ) {
+            if ( initializingPosition ) {
+              initializingPosition = false;
+              return;
+            }
             updatePosition();
+          }
       });
       map.setStreetView(panorama);
 
@@ -66,12 +73,12 @@
 
       startWalk();
 
-      document.getElementById('go-on').addEventListener('click', function(e) {
-        e.preventDefault();
-        console.log('<Move>');
-        followPath();
-        console.log('</Move>');
-      });
+      // document.getElementById('go-on').addEventListener('click', function(e) {
+      //   e.preventDefault();
+      //   console.log('<Move>');
+      //   followPath();
+      //   console.log('</Move>');
+      // });
 
     }
     google.maps.event.addDomListener(window, 'load', initialize);
@@ -79,9 +86,12 @@
 
     function startWalk() {
       // Reset
+      initializingPosition = true;
       nextPositionIndex = 1;
       misturnCount = 0;
       moveCount = 0;
+
+      document.getElementById('walk-title').innerHTML = '&ldquo;' + walkList[ currentWalk ].name + '&rdquo;';
 
       // Reposition
       // panorama.setPov({ heading: 0, pitch: 0 });  
@@ -100,7 +110,7 @@
       directionsService.route(request, function(response, status) {
         if (status == google.maps.DirectionsStatus.OK) {
           processDirections( response );
-          panorama.setPov({ heading: 0, pitch: 0 });
+          // updatePosition();
           panorama.setPosition( walkList[ currentWalk ].startPosition );
         }
           
@@ -109,6 +119,7 @@
 
     function endOfWalk() {
       // alert('End of Walking');
+      console.log('END OF WALK');
       if ( ++currentWalk >= walkList.length )
         currentWalk = 0;
       startWalk();
@@ -116,15 +127,12 @@
 
     function processDirections( directionResult ) {
       path = directionResult.routes[0].overview_path;
-      // nextPositionMarker = new google.maps.Marker({ position: path[0], map: map });
     }
 
     function updatePosition() {
       currentPosition = panorama.getPosition();
       console.log( 'Position is now ' + currentPosition );
-      // Pan every 3 moves
-      if ( moveCount++ % 3 == 0 )
-        map.panTo( currentPosition );
+      map.panTo( currentPosition );
       currentBearing = getBearing( currentPosition, path[ nextPositionIndex ] );
       
       // Remove old Marker
@@ -155,7 +163,6 @@
       // Check for end
       var distanceFromEnd = google.maps.geometry.spherical.computeDistanceBetween( currentPosition, walkList[ currentWalk ].endPosition );
       if ( distanceFromEnd < 15 ) {
-        console.log('Got to the end');
         endOfWalk();
       } else {
         setTimeout(function() {
@@ -169,21 +176,19 @@
       var links = panorama.getLinks(),
         closestLink = links[0];
 
-      console.log( links );
-
       for (var i=0; i<links.length; i++) {
-        console.log( 'Link ' + i + ': ' + links[i].heading + ' (' + links[i].description + ')');
+        // console.log( 'Link ' + i + ': ' + links[i].heading + ' (' + links[i].description + ')');
         if ( Math.abs( links[i].heading - currentBearing ) < Math.abs( closestLink.heading - currentBearing ) ) {
           closestLink = links[i];
         }
       }
       // Todo, handle no 'next closest link' by checking heading difference
       var difference = Math.abs( closestLink.heading - currentBearing );
-      console.log( 'Link Heading: ' + closestLink.heading );
-      console.log( 'Current Heading: ' + currentBearing );
-      console.log( 'Difference: ' + difference );
-      console.log( '--' );
+      // console.log( 'Link Heading: ' + closestLink.heading );
+      // console.log( 'Current Heading: ' + currentBearing );
+      // console.log( 'Difference: ' + difference );
       if ( difference > 25 ) {
+        console.log('Misturn! ' + misturnCount );
         if ( ++misturnCount > 3 ) {
           // Todo Implement Teleporting Again, checking for distance from
           // Sorry, can't walk any more.
@@ -200,17 +205,17 @@
       panorama.setPano( closestLink.pano );
     }
 
-    function faceForward() {
-        console.log( '<Turning>' );
-        console.log( 'Current: ' + currentPosition );
-        console.log( 'Index: ' + nextPositionIndex );
-        console.log( 'Next: ' + path[ nextPositionIndex ]);
-        
+    function faceForward() {        
         currentBearing = getBearing( currentPosition, path[ nextPositionIndex ] );
         if ( currentBearing != null )
           panorama.setPov({ heading: currentBearing, pitch: 0 });
-        console.log( 'Bearing: ' + currentBearing );
-        console.log( '</Turning>' );
+
+        // console.log( '<Turning>' );
+        // console.log( 'Current: ' + currentPosition );
+        // console.log( 'Index: ' + nextPositionIndex );
+        // console.log( 'Next: ' + path[ nextPositionIndex ]);
+        // console.log( 'Bearing: ' + currentBearing );
+        // console.log( '</Turning>' );
     }
 
     function getBearing(origin, destination) {
@@ -275,7 +280,6 @@
 
     function onPlayerStateChange(event) {
       if ( event.data == YT.PlayerState.ENDED ) {
-        console.log( 'ENDED' );
         if ( ++currentMusic >= musicPlaylist.length )
           currentMusic = 0;
         event.target.loadVideoById( musicPlaylist[ currentMusic ] );

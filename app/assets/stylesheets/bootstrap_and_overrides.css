@@ -10,3 +10,11 @@
   .lat-long {
     margin-top: 5px;
   }
+
+#walk-title {
+  line-height: 40px;
+  font-family: 'Lobster', cursive;
+  color: gray;
+  font-size: 16px;
+  margin: auto;
+}

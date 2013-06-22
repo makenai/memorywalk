@@ -4,9 +4,10 @@
         panorama,
         path = [],
         currentBearing,
+        lastBearing,
         currentPosition,
         nextPositionIndex = 1,
-        moveTimeout = 1000,
+        moveTimeout = 800,
         nextPositionMarker,
         misturnCount = 0,
         moveCount = 0,
@@ -86,12 +87,12 @@
         }
       });      
 
-      // document.getElementById('go-on').addEventListener('click', function(e) {
-      //   e.preventDefault();
-      //   console.log('<Move>');
-      //   followPath();
-      //   console.log('</Move>');
-      // });
+      document.getElementById('go-on').addEventListener('click', function(e) {
+        e.preventDefault();
+        console.log('<Move>');
+        followPath();
+        console.log('</Move>');
+      });
 
     }
     google.maps.event.addDomListener(window, 'load', initialize);
@@ -157,6 +158,7 @@
           path[ skipIndex ] );
         if ( distance < 10 ) {
           console.log('Point reached');
+          lastBearing = currentBearing;
           console.log( skipIndex + ' / ' + path.length );
           if ( skipIndex < path.length ) {
             nextPositionIndex = skipIndex + 1;
@@ -188,13 +190,17 @@
 
     function followPath() {
       var links = panorama.getLinks(),
-        closestLink = links[0];
+        closestLink = links[0],
+        closestLinkToLastBearing = links[0];
 
       for (var i=0; i<links.length; i++) {
-        // console.log( 'Link ' + i + ': ' + links[i].heading + ' (' + links[i].description + ')');
+        console.log( 'Link ' + i + ': ' + links[i].heading + ' (' + links[i].description + ')');
         if ( Math.abs( links[i].heading - currentBearing ) < Math.abs( closestLink.heading - currentBearing ) ) {
           closestLink = links[i];
         }
+        if ( Math.abs( links[i].heading - lastBearing ) < Math.abs( closestLink.heading - lastBearing ) ) {
+          closestLinkToLastBearing = links[i];
+        }        
       }
       // Todo, handle no 'next closest link' by checking heading difference
       var difference = Math.abs( closestLink.heading - currentBearing );
@@ -212,6 +218,9 @@
           // panorama.setPosition( path[ nextPositionIndex ] );
           return;
         }
+        var lastDifference = Math.abs( closestLinkToLastBearing.heading - lastBearing );
+        if ( lastDifference < 25 )
+          closestLink = closestLinkToLastBearing;
       } else {
         misturnCount = 0;
       }

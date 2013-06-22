@@ -13,10 +13,13 @@
  *= require jquery.ui.all
  */
 
+ #aboutContainer {
+  width: 600px;
+ }
+
 #play-pause {
   display: none;
 }
-
 #play-pause.playing {
   display: inline-block;
   color: green;
@@ -28,8 +31,6 @@
   color: green;
 }
 #play-pause.paused i.icon-pause { display: none; }
-
-
 
  #player {
   width: 200px;

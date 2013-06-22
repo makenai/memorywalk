@@ -13,6 +13,24 @@
  *= require jquery.ui.all
  */
 
+#play-pause {
+  display: none;
+}
+
+#play-pause.playing {
+  display: inline-block;
+  color: green;
+}
+#play-pause.playing i.icon-play { display: none; }
+
+#play-pause.paused {
+  display: inline-block;
+  color: green;
+}
+#play-pause.paused i.icon-pause { display: none; }
+
+
+
  #player {
   width: 200px;
   height: 200px;

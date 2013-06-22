@@ -14,7 +14,8 @@
         currentMusic = 0,
         walkList = [],
         currentWalk = 0,
-        initializingPosition = false;
+        initializingPosition = false,
+        moveTimer;
 
 <% ([ @walk ] + @other_walks).each do |walk| %>
     walkList.push({
@@ -28,7 +29,6 @@
 <% end %>
 
     function initialize() {
-
 
       google.maps.visualRefresh = true;
 
@@ -73,6 +73,19 @@
 
       startWalk();
 
+      document.getElementById('play-pause').addEventListener('click', function(e) {
+        e.preventDefault();
+        if ( this.className == 'paused' ) {
+          this.className = 'playing';
+          moveTimer = setTimeout(function() {
+            followPath();
+          }, moveTimeout );
+        } else if ( this.className == 'playing' ) {
+          this.className = 'paused';
+          clearTimeout( moveTimer );
+        }
+      });      
+
       // document.getElementById('go-on').addEventListener('click', function(e) {
       //   e.preventDefault();
       //   console.log('<Move>');
@@ -92,6 +105,7 @@
       moveCount = 0;
 
       document.getElementById('walk-title').innerHTML = '&ldquo;' + walkList[ currentWalk ].name + '&rdquo;';
+      document.getElementById('play-pause').className = 'playing';
 
       // Reposition
       // panorama.setPov({ heading: 0, pitch: 0 });  
@@ -165,7 +179,7 @@
       if ( distanceFromEnd < 15 ) {
         endOfWalk();
       } else {
-        setTimeout(function() {
+        moveTimer = setTimeout(function() {
           followPath();
         }, moveTimeout );
       }

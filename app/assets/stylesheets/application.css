@@ -74,7 +74,7 @@ div.container-fluid {
 }
 
 #go-on {
-  display: block;
+  display: none;
   padding: 5px;
   border: 1px solid black;
   background-color: green;

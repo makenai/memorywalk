@@ -13,8 +13,8 @@ class WalksController < ApplicationController
   # GET /walks/1
   # GET /walks/1.json
   def show
-    @walk = Walk.find(params[:id])
-
+    walk_ids = params[:id].split(',')
+    @walk, *@other_walks = walk_ids.collect { |id| Walk.find( id ) rescue nil }.compact
     respond_to do |format|
       format.html # show.html.erb
       format.json { render json: @walk }

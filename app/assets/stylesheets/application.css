@@ -38,13 +38,13 @@ div.container-fluid {
 }
 
  #map-canvas { 
-  height: 150px; 
-  width: 200px; 
+  height: 350px; 
+  width: 400px; 
   position: absolute;
   right: 10px;
   top: 10px;
   border: 1px solid black;
-  opacity: 0.5;
+  opacity: 0.85;
 }
 
 #streetview {

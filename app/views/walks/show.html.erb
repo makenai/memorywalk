@@ -2,44 +2,35 @@
 
     var map,
         panorama,
-        markerArray = [],
         path = [],
         currentBearing,
         currentPosition,
         nextPositionIndex = 1,
-        startPosition,
-        endPosition,
-        moveTimeout = 4500,
+        moveTimeout = 800,
         nextPositionMarker,
         misturnCount = 0,
         moveCount = 0,
         musicPlaylist = [],
-        currentMusic = 0;
+        currentMusic = 0,
+        walkList = [],
+        currentWalk = 0;
 
+<% ([ @walk ] + @other_walks).each do |walk| %>
+    walkList.push({
+      name: '<%= walk.name %>',
+      startPosition: new google.maps.LatLng( <%= walk.walk_points.first %> ),
+      endPosition: new google.maps.LatLng( <%= walk.walk_points.last %> )
+    });
 <% if @walk.has_song? %>
-    musicPlaylist.push('<%= @walk.youtube_code %>');
+    // musicPlaylist.push('<%= walk.youtube_code %>');
+<% end %>
 <% end %>
 
     function initialize() {
 
       google.maps.visualRefresh = true;
 
-      startPosition = new google.maps.LatLng( <%= @walk.walk_points.first %> );
-      endPosition = new google.maps.LatLng( <%= @walk.walk_points.last %> );
-
-      // Coffee Shop
-      // startPosition = new google.maps.LatLng( -37.784008, 144.983368 );
-      // endPosition   = new google.maps.LatLng( -37.787132, 144.982544 );
-
-      // Lettuce Systems
-      // startPosition = new google.maps.LatLng( -37.785885, 144.930771 );
-      // endPosition   = new google.maps.LatLng( -37.796574, 144.932587 );
-
-      // Flinders to Bar
-      // startPosition = new google.maps.LatLng( -37.817497, 144.967575 );
-      // endPosition   = new google.maps.LatLng( -37.818649, 144.968704 );
-
-      currentPosition = startPosition;
+      currentPosition = walkList[ currentWalk ].startPosition;
 
       var mapOptions = {
         center: currentPosition,
@@ -73,18 +64,7 @@
       var directionsDisplay = new google.maps.DirectionsRenderer();
       directionsDisplay.setMap(map);
 
-      var directionsService = new google.maps.DirectionsService();
-      var request = {
-          origin: currentPosition,
-          destination: endPosition,
-          travelMode: google.maps.DirectionsTravelMode.WALKING
-      };
-      directionsService.route(request, function(response, status) {
-        if (status == google.maps.DirectionsStatus.OK) {
-          // directionsDisplay.setDirections( response );
-          processDirections( response );
-        }
-      });
+      startWalk();
 
       document.getElementById('go-on').addEventListener('click', function(e) {
         e.preventDefault();
@@ -96,25 +76,59 @@
     }
     google.maps.event.addDomListener(window, 'load', initialize);
 
+
+    function startWalk() {
+      // Reset
+      nextPositionIndex = 1;
+      misturnCount = 0;
+      moveCount = 0;
+
+      // Reposition
+      // panorama.setPov({ heading: 0, pitch: 0 });  
+      // console.log( walkList[ currentWalk ] );
+      // console.log( 'Starting position is ' + panorama.getPosition() );
+      // console.log( 'Setting position to ' + walkList[ currentWalk ].startPosition );
+      // panorama.setPosition( walkList[ currentWalk ].startPosition );
+
+      // Get new directions
+      var directionsService = new google.maps.DirectionsService();
+      var request = {
+          origin: walkList[ currentWalk ].startPosition,
+          destination: walkList[ currentWalk ].endPosition,
+          travelMode: google.maps.DirectionsTravelMode.WALKING
+      };
+      directionsService.route(request, function(response, status) {
+        if (status == google.maps.DirectionsStatus.OK) {
+          processDirections( response );
+          panorama.setPov({ heading: 0, pitch: 0 });
+          panorama.setPosition( walkList[ currentWalk ].startPosition );
+        }
+          
+      });
+    }
+
     function endOfWalk() {
-      alert('End of Walking');
+      // alert('End of Walking');
+      if ( ++currentWalk >= walkList.length )
+        currentWalk = 0;
+      startWalk();
     }
 
     function processDirections( directionResult ) {
       path = directionResult.routes[0].overview_path;
-      nextPositionMarker = new google.maps.Marker({ position: path[0], map: map });
-      followPath();
+      // nextPositionMarker = new google.maps.Marker({ position: path[0], map: map });
     }
 
     function updatePosition() {
       currentPosition = panorama.getPosition();
+      console.log( 'Position is now ' + currentPosition );
       // Pan every 3 moves
       if ( moveCount++ % 3 == 0 )
         map.panTo( currentPosition );
       currentBearing = getBearing( currentPosition, path[ nextPositionIndex ] );
       
       // Remove old Marker
-      nextPositionMarker.setMap(null);
+      // nextPositionMarker.setMap(null);
 
       for ( var skipIndex=nextPositionIndex; skipIndex < path.length - 1; skipIndex++ ) {
         var distance = google.maps.geometry.spherical.computeDistanceBetween( currentPosition, 
@@ -132,15 +146,16 @@
 
       faceForward();
 
-      nextPositionMarker = new google.maps.Marker({ 
-        position: path[ nextPositionIndex ], 
-        map: map, 
-        title: 'Idx ' + nextPositionIndex + ': ' + path[ nextPositionIndex ].toString() 
-      });
+      // nextPositionMarker = new google.maps.Marker({ 
+      //   position: path[ nextPositionIndex ], 
+      //   map: map, 
+      //   title: 'Idx ' + nextPositionIndex + ': ' + path[ nextPositionIndex ].toString() 
+      // });
 
       // Check for end
-      var distanceFromEnd = google.maps.geometry.spherical.computeDistanceBetween( currentPosition, endPosition );
+      var distanceFromEnd = google.maps.geometry.spherical.computeDistanceBetween( currentPosition, walkList[ currentWalk ].endPosition );
       if ( distanceFromEnd < 15 ) {
+        console.log('Got to the end');
         endOfWalk();
       } else {
         setTimeout(function() {
@@ -154,8 +169,10 @@
       var links = panorama.getLinks(),
         closestLink = links[0];
 
+      console.log( links );
+
       for (var i=0; i<links.length; i++) {
-        console.log( 'Link ' + i + ': ' + links[i].heading );
+        console.log( 'Link ' + i + ': ' + links[i].heading + ' (' + links[i].description + ')');
         if ( Math.abs( links[i].heading - currentBearing ) < Math.abs( closestLink.heading - currentBearing ) ) {
           closestLink = links[i];
         }
@@ -179,6 +196,7 @@
       } else {
         misturnCount = 0;
       }
+      console.log( 'setPano ' + closestLink.pano );
       panorama.setPano( closestLink.pano );
     }
 
@@ -190,7 +208,7 @@
         
         currentBearing = getBearing( currentPosition, path[ nextPositionIndex ] );
         if ( currentBearing != null )
-          panorama.setPov({ heading: currentBearing, pitch: 0 });  
+          panorama.setPov({ heading: currentBearing, pitch: 0 });
         console.log( 'Bearing: ' + currentBearing );
         console.log( '</Turning>' );
     }

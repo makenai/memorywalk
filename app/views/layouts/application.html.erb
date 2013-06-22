@@ -34,8 +34,13 @@
     <!-- Size should be 32 x 32 pixels -->
     <%= favicon_link_tag 'favicon.ico', :rel => 'shortcut icon' %>
     <link href='http://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
+    <%= javascript_include_tag "application" %>
+    <script type="text/javascript" 
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4TVBOaPFwZL6lhyQqX0rpBkTVXNRHxaM&sensor=false"></script>
   </head>
   <body>
+
+    <div id="streetview"></div>
 
     <div class="navbar navbar-fluid-top">
       <div class="navbar-inner">
@@ -64,17 +69,7 @@
           <%= yield %>
         </div>
       </div><!--/row-->
-
-      <footer>
-        <p>by <a href="http://twitter.com/makenai">@makenai</a></p>
-      </footer>
-
     </div> <!-- /container -->
-
-    <!-- Javascripts
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <%= javascript_include_tag "application" %>
 
   </body>
 </html>

@@ -172,9 +172,9 @@
         if ( distanceFromEnd < 15 ) {
           endOfWalk();
         } else {
-          // setTimeout(function() {
-          //   followPath();
-          // }, moveTimeout );
+          setTimeout(function() {
+            followPath();
+          }, moveTimeout );
         }
 
       }
@@ -279,6 +279,6 @@ function showSteps(directionResult) {
   <body>
     <div id="streetview"></div>
     <div id="map-canvas"></div>
-    <a id="go-on" href="#">Advance</div>
+    <a id="go-on" href="#">Advance</a>
   </body>
 </html>

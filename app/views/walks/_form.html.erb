@@ -1,3 +1,5 @@
+<div id="map-form-container">
+
 <%= form_for @walk, :html => { :class => 'form-horizontal' } do |f| %>
 
 <% if @walk.errors.any? %>
@@ -14,7 +16,7 @@
   <div class="control-group">
     <%= f.label :name, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :name, :class => 'text_field' %>
+      <%= f.text_field :name, :class => 'text_field span4' %>
       <span class="help-block">What do we call this walk?</span>
     </div>
   </div>
@@ -22,7 +24,7 @@
   <div class="control-group">
     <%= f.label :song_link, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :song_link, :class => 'text_field' %>
+      <%= f.text_field :song_link, :class => 'text_field span4' %>
       <span class="help-block">YouTube URL</span>
     </div>
   </div>
@@ -31,11 +33,11 @@
   <div class="control-group">
     <%= g.label :location, g.object.label, :class => 'control-label' %>
     <div class="controls">
-      <%= g.text_field :location, rows: 2, placeholder: 'Location', class: 'text_field span4' %>
+      <%= g.text_field :location, rows: 2, placeholder: 'Address or Location', class: 'location-field text_field span4' %>
     </div>
     <div class="controls controls-row lat-long">
-      <%= g.text_field :lat, placeholder: 'Latitude', class: 'text_field span2' %>
-      <%= g.text_field :long, placeholder: 'Longitude', class: 'text_field span2' %>
+      <%= g.text_field :lat, placeholder: 'Latitude', class: 'lat-field text_field span2' %>
+      <%= g.text_field :long, placeholder: 'Longitude', class: 'long-field text_field span2' %>
     </div>
   </div>
   <% end %>
@@ -46,3 +48,59 @@
                 walks_path, :class => 'btn' %>
   </div>
 <% end %>
+
+<div id="map-canvas-form"></div>
+
+</div>
+
+<script type="text/javascript">
+
+  var startPosition = new google.maps.LatLng( -38.367502153950454, 145.30792236328125 );
+
+  var mapOptions = {
+    zoom: 8,
+    center: startPosition,
+    panControl: false,
+    mapTypeControl: false,
+    scaleControl: false,
+    zoomControl: false,
+    mapTypeId: google.maps.MapTypeId.HYBRID
+  };
+  map = new google.maps.Map(document.getElementById("map-canvas-form"), mapOptions);
+
+  var geocoder = new google.maps.Geocoder();
+
+  jQuery(document).ready(function($) {
+
+     $( 'input.location-field' ).autocomplete({
+      minLength: 5,
+      source: function(request, response) {
+        console.log( request.term );
+        geocoder.geocode( { address: request.term }, function(results, status) {
+          response( 
+            $.map( results, function(item) {
+              return {
+                label: item.formatted_address,
+                value: item.geometry.location
+              }
+            })
+          );
+        });        
+      },
+      focus: function( event, ui ) {
+        return false;
+      },
+      select: function( event, ui ) {
+        this.value = ui.item.label;
+        $(this).parent().next().find('input.lat-field').val( ui.item.value.jb );
+        $(this).parent().next().find('input.long-field').val( ui.item.value.kb );
+        console.log('Select'); 
+        console.log( ui.item.label );
+        console.log( ui.item.value );
+        return false;
+      }
+    });
+
+  });
+
+</script>

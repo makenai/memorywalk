@@ -10,4 +10,77 @@
  *
  *= require_self
  *= require_tree .
+ *= require jquery.ui.all
  */
+
+ #player {
+  width: 200px;
+  height: 200px;
+  position: absolute;
+  bottom: 20px;
+  right: 10px;
+  opacity: 0.05;
+ }
+
+div.navbar {
+  z-index: 1001;
+  position: relative;
+  opacity: 0.9;
+}
+
+div.container-fluid {
+  z-index: 1000;
+  position: relative;
+}
+
+ #map-canvas img {
+  max-width: none;
+}
+
+ #map-canvas { 
+  height: 150px; 
+  width: 200px; 
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  border: 1px solid black;
+  opacity: 0.5;
+}
+
+#streetview {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#go-on {
+  display: none;
+  padding: 5px;
+  border: 1px solid black;
+  background-color: green;
+  color: white;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
+ #map-form-container {
+  position: relative;
+ }
+
+ #map-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+ }
+
+ #map-canvas-form {
+  width: 400px;
+  height: 400px;
+  position: absolute;
+  top: 0;
+  right: 75px;
+  border: 1px solid black;
+ }

@@ -56,6 +56,11 @@ div.container-fluid {
   max-width: none;
 }
 
+#streetview img {
+    border: none !important;
+    max-width: none !important;
+}
+
  #map-canvas { 
   height: 150px; 
   width: 200px; 

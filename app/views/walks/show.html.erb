@@ -16,7 +16,8 @@
         walkList = [],
         currentWalk = 0,
         initializingPosition = false,
-        moveTimer;
+        moveTimer,
+        panoCounts = {};
 
 <% ([ @walk ] + @other_walks).each do |walk| %>
     walkList.push({
@@ -104,6 +105,7 @@
       nextPositionIndex = 1;
       misturnCount = 0;
       moveCount = 0;
+      panoCounts = {};
 
       document.getElementById('walk-title').innerHTML = '&ldquo;' + walkList[ currentWalk ].name + '&rdquo;';
 
@@ -207,9 +209,8 @@
       // console.log( 'Link Heading: ' + closestLink.heading );
       // console.log( 'Current Heading: ' + currentBearing );
       // console.log( 'Difference: ' + difference );
-      if ( difference > 25 ) {
-        console.log('Misturn! ' + misturnCount );
-        if ( ++misturnCount > 3 ) {
+      if ( difference > 40 ) {
+        if ( ++misturnCount > 5 ) {
           // Todo Implement Teleporting Again, checking for distance from
           // Sorry, can't walk any more.
           // console.log('Too many bad turns');
@@ -219,13 +220,20 @@
           return;
         }
         var lastDifference = Math.abs( closestLinkToLastBearing.heading - lastBearing );
-        if ( lastDifference < 25 )
+        if ( lastDifference < 25 ) {
           closestLink = closestLinkToLastBearing;
+        }
+          
       } else {
         misturnCount = 0;
       }
-      console.log( 'setPano ' + closestLink.pano );
-      panorama.setPano( closestLink.pano );
+      if ( panoCounts[ closestLink.pano ] ) {
+        console.log('Repeated pano');
+        endOfWalk();
+      } else {
+        panoCounts[ closestLink.pano ] = 1;
+        panorama.setPano( closestLink.pano );  
+      }
     }
 
     function faceForward() {        

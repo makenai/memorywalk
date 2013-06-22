@@ -105,7 +105,6 @@
       moveCount = 0;
 
       document.getElementById('walk-title').innerHTML = '&ldquo;' + walkList[ currentWalk ].name + '&rdquo;';
-      document.getElementById('play-pause').className = 'playing';
 
       // Reposition
       // panorama.setPov({ heading: 0, pitch: 0 });  
@@ -144,6 +143,7 @@
     }
 
     function updatePosition() {
+      document.getElementById('play-pause').className = 'playing';
       currentPosition = panorama.getPosition();
       console.log( 'Position is now ' + currentPosition );
       map.panTo( currentPosition );

@@ -19,7 +19,13 @@ test:
   timeout: 5000
 
 production:
-  adapter: sqlite3
-  database: db/production.sqlite3
+  adapter: mysql2
+  host: localhost
+  encoding: utf8
+  reconnect: false
+  database: memorywalk
   pool: 5
+  username: memorywalk
+  password: w4lk
   timeout: 5000
+

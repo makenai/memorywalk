@@ -8,6 +8,7 @@ gem 'rails', '3.2.13'
 gem 'twitter-bootstrap-rails'
 gem 'nested_form'
 gem 'capistrano'
+gem 'kaminari'
 
 group :development do
   gem 'sqlite3'

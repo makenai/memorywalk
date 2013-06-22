@@ -2,7 +2,7 @@ class WalksController < ApplicationController
   # GET /walks
   # GET /walks.json
   def index
-    @walks = Walk.all
+    @walks = Walk.order(:created_at).page( params[:page] )
 
     respond_to do |format|
       format.html # index.html.erb

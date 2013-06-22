@@ -66,11 +66,50 @@
     zoomControl: false,
     mapTypeId: google.maps.MapTypeId.HYBRID
   };
-  map = new google.maps.Map(document.getElementById("map-canvas-form"), mapOptions);
+  var map = new google.maps.Map(document.getElementById("map-canvas-form"), mapOptions);
+  var marker = new google.maps.Marker();
+  marker.setMap( map );
+
+  var directionsDisplay = new google.maps.DirectionsRenderer();
+  directionsDisplay.setMap(map);
+
+  function showPlace( coordinates ) {
+    map.setZoom( 16 );
+    map.setCenter( coordinates );
+    marker.setPosition( coordinates );
+    marker.setVisible( true );
+  }
+
+  function showRoute() {
+    var lat1 = $('input.lat-field:first').val();
+    var lat2 = $('input.lat-field:last').val();
+    var long1 = $('input.long-field:first').val();
+    var long2 = $('input.long-field:last').val();
+    if ( lat1 != '' && long1 != '' && lat2 != '' && long2 != '' ) {
+      marker.setVisible( false );
+      var start = new google.maps.LatLng( lat1, long1 );
+      var end = new google.maps.LatLng( lat2, long2 );
+      var directionsService = new google.maps.DirectionsService();
+      var request = {
+          origin: start,
+          destination: end,
+          travelMode: google.maps.DirectionsTravelMode.WALKING
+      };
+      directionsService.route(request, function(response, status) {
+        if (status == google.maps.DirectionsStatus.OK) {
+          directionsDisplay.setDirections( response );
+        }
+      });
+    }
+  }
 
   var geocoder = new google.maps.Geocoder();
 
   jQuery(document).ready(function($) {
+
+    $( 'input.lat-field,input.long-field' ).on('change', function(e) {
+      showRoute();
+    });
 
      $( 'input.location-field' ).autocomplete({
       minLength: 5,
@@ -88,15 +127,14 @@
         });        
       },
       focus: function( event, ui ) {
+        showPlace( ui.item.value );
         return false;
       },
       select: function( event, ui ) {
         this.value = ui.item.label;
         $(this).parent().next().find('input.lat-field').val( ui.item.value.jb );
         $(this).parent().next().find('input.long-field').val( ui.item.value.kb );
-        console.log('Select'); 
-        console.log( ui.item.label );
-        console.log( ui.item.value );
+        showRoute();
         return false;
       }
     });

@@ -7,7 +7,7 @@ class WalkPoint < ActiveRecord::Base
 
 
   def to_s
-    "#{lat}, #{long}"
+    "#{lat},#{long}"
   end
 
 end

@@ -91,9 +91,9 @@
 
       document.getElementById('go-on').addEventListener('click', function(e) {
         e.preventDefault();
-        console.log('<Move>');
+        // console.log('<Move>');
         followPath();
-        console.log('</Move>');
+        // console.log('</Move>');
       });
 
     }
@@ -136,7 +136,7 @@
 
     function endOfWalk() {
       // alert('End of Walking');
-      console.log('END OF WALK');
+      // console.log('END OF WALK');
       if ( ++currentWalk >= walkList.length )
         currentWalk = 0;
       startWalk();
@@ -149,7 +149,7 @@
     function updatePosition() {
       document.getElementById('play-pause').className = 'playing';
       currentPosition = panorama.getPosition();
-      console.log( 'Position is now ' + currentPosition );
+      // console.log( 'Position is now ' + currentPosition );
       map.panTo( currentPosition );
       currentBearing = getBearing( currentPosition, path[ nextPositionIndex ] );
       
@@ -160,9 +160,9 @@
         var distance = google.maps.geometry.spherical.computeDistanceBetween( currentPosition, 
           path[ skipIndex ] );
         if ( distance < 10 ) {
-          console.log('Point reached');
+          // console.log('Point reached');
           lastBearing = currentBearing;
-          console.log( skipIndex + ' / ' + path.length );
+          // console.log( skipIndex + ' / ' + path.length );
           if ( skipIndex < path.length ) {
             nextPositionIndex = skipIndex + 1;
           } else {
@@ -197,7 +197,7 @@
         closestLinkToLastBearing = links[0];
 
       for (var i=0; i<links.length; i++) {
-        console.log( 'Link ' + i + ': ' + links[i].heading + ' (' + links[i].description + ')');
+        // console.log( 'Link ' + i + ': ' + links[i].heading + ' (' + links[i].description + ')');
         if ( Math.abs( links[i].heading - currentBearing ) < Math.abs( closestLink.heading - currentBearing ) ) {
           closestLink = links[i];
         }
@@ -229,7 +229,7 @@
         misturnCount = 0;
       }
       if ( panoCounts[ closestLink.pano ] ) {
-        console.log('Repeated pano');
+        // console.log('Repeated pano');
         endOfWalk();
       } else {
         panoCounts[ closestLink.pano ] = 1;
